@@ -1,0 +1,412 @@
+/* ============================================================
+   Homepage — Digitalizar Caderno
+   Estilos minimalistas complementares ao Infima/Docusaurus
+   ============================================================ */
+
+.main {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 60px);
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* --- Header --- */
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* --- Card / Form --- */
+
+.card {
+  background: var(--ifm-card-background-color, var(--ifm-background-surface-color));
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* --- Mode Toggle --- */
+
+.modeToggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modeBtn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ifm-font-color-base);
+  transition: background 0.15s, color 0.15s;
+}
+
+.modeBtn:hover {
+  background: var(--ifm-color-emphasis-200);
+}
+
+.modeBtnActive {
+  background: var(--ifm-color-primary);
+  color: #fff;
+}
+
+.modeBtnActive:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.fileInput {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px dashed var(--ifm-color-emphasis-400);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.fileInput:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.textInput {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  transition: border-color 0.2s;
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 2px var(--ifm-color-primary-lightest);
+}
+
+.selectInput {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.selectInput:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 2px var(--ifm-color-primary-lightest);
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-500);
+  font-weight: 400;
+}
+
+.hint code {
+  background: var(--ifm-color-emphasis-200);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
+
+.mainButton {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.mainButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Image Grid (Reordenação) --- */
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.6rem;
+}
+
+.imageCard {
+  position: relative;
+  border: 2px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ifm-color-emphasis-100);
+  cursor: grab;
+  transition: border-color 0.15s, transform 0.15s, opacity 0.15s;
+}
+
+.imageCard:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.imageCard.dragging {
+  opacity: 0.4;
+  transform: scale(0.95);
+  border-color: var(--ifm-color-primary);
+}
+
+.imageOrder {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: var(--ifm-color-primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.thumbnail {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+}
+
+.imageActions {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--ifm-color-emphasis-200);
+}
+
+.imageBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  color: var(--ifm-font-color-base);
+  transition: background 0.15s;
+}
+
+.imageBtn:hover:not(:disabled) {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.imageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.imageBtnDanger:hover:not(:disabled) {
+  background: var(--ifm-color-danger-lightest);
+  color: var(--ifm-color-danger-dark);
+}
+
+.imageName {
+  font-size: 0.65rem;
+  padding: 2px 4px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ifm-color-emphasis-600);
+}
+
+/* --- Loading --- */
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--ifm-color-emphasis-300);
+  border-top: 3px solid var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  font-weight: 600;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.loadingSubtext {
+  color: var(--ifm-color-emphasis-500);
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+}
+
+/* --- Preview --- */
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.previewTitle {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.previewPath {
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-500);
+  background: var(--ifm-color-emphasis-200);
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.previewContent {
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.previewText {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 250px;
+  padding: 1rem;
+  border: 2px solid var(--ifm-color-primary);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ifm-color-primary-lightest);
+}
+
+/* --- Actions --- */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.actionButton {
+  width: 100%;
+}
+
+/* --- Feedback --- */
+
+.feedback {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.success {
+  background: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success-darkest);
+  border: 1px solid var(--ifm-color-success-dark);
+}
+
+.error {
+  background: var(--ifm-color-danger-contrast-background);
+  color: var(--ifm-color-danger-darkest);
+  border: 1px solid var(--ifm-color-danger-dark);
+}
+
+/* --- Responsivo --- */
+
+@media (min-width: 640px) {
+  .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .actionButton {
+    width: auto;
+    flex: 1;
+  }
+
+  .imageGrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
