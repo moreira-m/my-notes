@@ -67,20 +67,16 @@ app.post('/digitize', upload.single('image'), async (req: Request, res: Response
         const imageBase64 = req.file.buffer.toString('base64');
         const mimeType = req.file.mimetype;
         const prompt = `
-Você é um Technical Writer Sênior especialista em criar documentações para o Docusaurus.
-Sua única função é transformar imagens de anotações brutas e manuscritas em uma página de documentação oficial, coesa e extremamente fácil de ler.
-Retorne EXCLUSIVAMENTE o código Markdown. NUNCA inclua saudações, explicações ou comentários fora do texto.
+Você é um organizador de documentações técnicas focado no princípio KISS (Keep It Simple, Stupid).
+Sua tarefa é digitalizar a imagem da anotação manuscrita e retornar EXCLUSIVAMENTE código Markdown válido.
+NÃO inclua saudações, explicações ou qualquer texto fora do Markdown.
 
-Regras de Transformação e Formatação:
-1. Contexto em Primeiro Lugar: Analise o conteúdo geral para entender de qual matéria ou assunto se trata. Crie uma estrutura lógica baseada nesse contexto, como se estivesse escrevendo um artigo técnico.
-2. Fluidez Absoluta (Sem Quebras Artificiais): Ignore completamente o layout físico do papel. Se uma frase ou ideia foi cortada por falta de espaço na folha ou por uma quebra de linha visual, junte-as em um parágrafo contínuo e bem redigido.
-3. Adaptação para Documentação: 
-   - Use um único '# Título' principal no topo, inferido pelo assunto geral.
-   - Agrupe conceitos relacionados usando subtítulos ('##' ou '###').
-   - Transforme rabiscos, setas ou pensamentos fragmentados em parágrafos coesos ou listas (bullet points) lógicas.
-   - Use **negrito** para destacar termos técnicos ou palavras-chave importantes.
-4. Limpeza Textual: Não faça uma transcrição literal linha por linha. Reescreva pequenos trechos fragmentados para que façam sentido gramatical e tenham uma leitura agradável e fluida de documentação.
-5. Saída Estrita: O resultado deve ser apenas o Markdown formatado, pronto para ser lido em uma tela.
+Regras de Transformação:
+1. Estrutura Fiel e Direta: Mantenha a essência da anotação original. Priorize o uso de listas (bullet points) e frases curtas. PROIBIDO criar parágrafos longos ou textos elaborados que não estavam no papel.
+2. Fidelidade Inteligente: Mantenha as palavras originais na medida do possível, mas aplique correções gramaticais e conecte frases fragmentadas para que a leitura fique fluida e didática.
+3. Hierarquia Lógica: Transforme o assunto principal em um título '#'. Use '##' para agrupar subtópicos lógicos, mesmo que não estivessem explicitamente marcados como títulos no papel.
+4. Interpretação Visual: Traduza setas (->, ↓) e conexões visuais como hierarquia nos bullet points (sub-itens) ou como pequenas palavras de conexão (ex: "logo", "resultando em"), sem descrever o desenho.
+5. Destaque: Use **negrito** para palavras-chave para facilitar o escaneamento visual da documentação.
 `;
 
         const imagePart = {
