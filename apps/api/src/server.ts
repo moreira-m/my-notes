@@ -11,6 +11,8 @@ import {
     getFileContent as ghGetFileContent,
     createOrUpdateFile as ghCreateOrUpdateFile,
 } from './github.js';
+import { findUser, verifyPassword, generateToken } from './auth.js';
+import { requireAuth } from './middleware.js';
 
 dotenv.config();
 
@@ -29,6 +31,35 @@ app.get('/', (req: Request, res: Response) => {
         message: 'Backend is running!',
         mode: isGitHubConfigured() ? 'github' : 'local',
     });
+});
+
+// ============================================================
+// POST /login — Autenticação de usuário
+// ============================================================
+app.post('/login', async (req: Request, res: Response) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Username e password são obrigatórios.' });
+        }
+
+        const user = await findUser(username);
+        if (!user) {
+            return res.status(401).json({ error: 'Credenciais inválidas.' });
+        }
+
+        const valid = await verifyPassword(password, user.passwordHash);
+        if (!valid) {
+            return res.status(401).json({ error: 'Credenciais inválidas.' });
+        }
+
+        const token = generateToken({ username: user.username });
+        return res.json({ token, username: user.username });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 app.post('/chat', async (req: Request, res: Response) => {
@@ -58,7 +89,10 @@ const upload = multer({
     },
 });
 
-app.post('/digitize', upload.single('image'), async (req: Request, res: Response) => {
+// ============================================================
+// POST /digitize — Digitalização de imagens (PROTEGIDA)
+// ============================================================
+app.post('/digitize', requireAuth, upload.single('image'), async (req: Request, res: Response) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'Image is required' })
@@ -136,7 +170,7 @@ app.get('/docs/files', async (req: Request, res: Response) => {
 // Produção: via GitHub API (commit) | Local: via filesystem
 // Body: { text: string, path: string, mode?: 'create' | 'append' }
 // ============================================================
-app.post('/save', async (req: Request, res: Response) => {
+app.post('/save', requireAuth, async (req: Request, res: Response) => {
     try {
         const { text, path: destPath, mode = 'create' } = req.body;
 
