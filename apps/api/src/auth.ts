@@ -59,6 +59,28 @@ export async function createUser(username: string, password: string): Promise<vo
     await saveUsers(users);
 }
 
+/**
+ * Cria o usuário padrão a partir das variáveis de ambiente
+ * DEFAULT_USER e DEFAULT_PASSWORD, se o arquivo users.json
+ * ainda não existir. Ideal para produção (Render).
+ */
+export async function ensureDefaultUser(): Promise<void> {
+    const defaultUser = process.env.DEFAULT_USER;
+    const defaultPassword = process.env.DEFAULT_PASSWORD;
+
+    if (!defaultUser || !defaultPassword) {
+        return; // Variáveis não definidas, pula
+    }
+
+    const existing = await findUser(defaultUser);
+    if (existing) {
+        return; // Usuário já existe
+    }
+
+    await createUser(defaultUser, defaultPassword);
+    console.log(`[Auth] Usuário padrão "${defaultUser}" criado automaticamente.`);
+}
+
 // ============================================================
 // Autenticação
 // ============================================================

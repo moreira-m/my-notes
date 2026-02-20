@@ -11,7 +11,7 @@ import {
     getFileContent as ghGetFileContent,
     createOrUpdateFile as ghCreateOrUpdateFile,
 } from './github.js';
-import { findUser, verifyPassword, generateToken } from './auth.js';
+import { findUser, verifyPassword, generateToken, ensureDefaultUser } from './auth.js';
 import { requireAuth } from './middleware.js';
 
 dotenv.config();
@@ -252,7 +252,10 @@ app.post('/save', requireAuth, async (req: Request, res: Response) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`Mode: ${isGitHubConfigured() ? 'GitHub API' : 'Local filesystem'}`);
+
+    // Cria usuário padrão a partir de variáveis de ambiente (produção)
+    await ensureDefaultUser();
 });
