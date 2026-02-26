@@ -29,14 +29,11 @@
 *   Even **agile methods** do not eliminate the need for **design**; **code alone** is rarely **sufficient documentation** for future **maintenance**.
 
 *   The **design process** involves **systematic, generic tasks** that transition the system from **high abstraction** to **low abstraction**, mapping **analysis elements** to **design elements**.
+    *   **Data/class projects** translate into **Architectural Elements**.
+    *   **Scenario behavioral elements** translate into **Interface Elements** and **Component Elements**.
+    *   **The process domain** involves:
+        *   **Partitioning** the analysis model into a **functionally cohesive subsystem**.
+        *   **Designing interfaces** for external devices.
+        *   **Developing a deployment model**.
 
 ---
-
-# Architectural Element Translations
-
-*   **Data/class projects** translate into **Architectural Elements**.
-*   **Scenario behavioral elements** translate into **Interface Elements** and **Component Elements**.
-*   **The process domain** involves:
-    *   **Partitioning** the analysis model into a **functionally cohesive subsystem**.
-    *   **Designing interfaces** for external devices.
-    *   **Developing a deployment model**.
