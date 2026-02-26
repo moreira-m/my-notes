@@ -1,7 +1,3 @@
-
-
----
-
 # Software Design & Quality
 
 ## Attributes (FURPS)
