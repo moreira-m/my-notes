@@ -12,6 +12,7 @@ import {
     createOrUpdateFile as ghCreateOrUpdateFile,
 } from './github.js';
 import { findUser, verifyPassword, generateToken, ensureDefaultUser } from './auth.js';
+import { prompts, getPromptById } from './prompts.js';
 import { requireAuth } from './middleware.js';
 
 dotenv.config();
@@ -82,6 +83,14 @@ app.post('/chat', async (req: Request, res: Response) => {
     }
 });
 
+// ============================================================
+// GET /prompts — Lista os prompts disponíveis
+// ============================================================
+app.get('/prompts', (req: Request, res: Response) => {
+    const list = prompts.map(({ id, name, description }) => ({ id, name, description }));
+    return res.json({ prompts: list });
+});
+
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -98,20 +107,18 @@ app.post('/digitize', requireAuth, upload.single('image'), async (req: Request, 
             return res.status(400).json({ error: 'Image is required' })
         }
 
+        const promptId = req.body.promptId as string;
+        if (!promptId) {
+            return res.status(400).json({ error: 'promptId is required' });
+        }
+
+        const selectedPrompt = getPromptById(promptId);
+        if (!selectedPrompt) {
+            return res.status(400).json({ error: `Prompt não encontrado: ${promptId}` });
+        }
+
         const imageBase64 = req.file.buffer.toString('base64');
         const mimeType = req.file.mimetype;
-        const prompt = `
-Você é um organizador de documentações técnicas focado no princípio KISS (Keep It Simple, Stupid).
-Sua tarefa é digitalizar a imagem da anotação manuscrita e retornar EXCLUSIVAMENTE código Markdown válido.
-NÃO inclua saudações, explicações ou qualquer texto fora do Markdown.
-
-Regras de Transformação:
-1. Estrutura Fiel e Direta: Mantenha a essência da anotação original. Priorize o uso de listas (bullet points) e frases curtas. PROIBIDO criar parágrafos longos ou textos elaborados que não estavam no papel.
-2. Fidelidade Inteligente: Mantenha as palavras originais na medida do possível, mas aplique correções gramaticais e conecte frases fragmentadas para que a leitura fique fluida e didática.
-3. Hierarquia Lógica: Transforme o assunto principal em um título '#'. Use '##' para agrupar subtópicos lógicos, mesmo que não estivessem explicitamente marcados como títulos no papel.
-4. Interpretação Visual: Traduza setas (->, ↓) e conexões visuais como hierarquia nos bullet points (sub-itens) ou como pequenas palavras de conexão (ex: "logo", "resultando em"), sem descrever o desenho.
-5. Destaque: Use **negrito** para palavras-chave para facilitar o escaneamento visual da documentação.
-`;
 
         const imagePart = {
             inlineData: {
@@ -121,7 +128,7 @@ Regras de Transformação:
         }
 
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent([prompt, imagePart]);
+        const result = await model.generateContent([selectedPrompt.prompt, imagePart]);
         const response = await result.response;
         const text = response.text();
 

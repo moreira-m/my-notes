@@ -20,11 +20,19 @@ async function loginRequest(apiUrl, username, password) {
   return response.json();
 }
 
-async function handleDigitalizeRequest(apiUrl, files, token) {
+async function fetchPrompts(apiUrl) {
+  const response = await fetch(`${apiUrl}/prompts`);
+  if (!response.ok) throw new Error('Erro ao carregar prompts');
+  const data = await response.json();
+  return data.prompts;
+}
+
+async function handleDigitalizeRequest(apiUrl, files, token, promptId) {
   const results = [];
   for (const file of files) {
     const formData = new FormData();
     formData.append('image', file);
+    formData.append('promptId', promptId);
     const response = await fetch(`${apiUrl}/digitize`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
@@ -196,6 +204,10 @@ export default function Home() {
   const [existingFiles, setExistingFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
 
+  // Prompts / Skills
+  const [availablePrompts, setAvailablePrompts] = useState([]);
+  const [selectedPromptId, setSelectedPromptId] = useState('');
+
   const fileInputRef = useRef(null);
   const idCounter = useRef(0);
 
@@ -203,6 +215,14 @@ export default function Home() {
   useEffect(() => {
     const stored = getStoredAuth();
     if (stored) setAuth(stored);
+
+    // Carrega prompts disponíveis
+    fetchPrompts(apiUrl)
+      .then((list) => {
+        setAvailablePrompts(list);
+        if (list.length > 0) setSelectedPromptId(list[0].id);
+      })
+      .catch((err) => console.error('Erro ao carregar prompts:', err));
   }, []);
 
   // Carrega lista de arquivos existentes ao trocar para modo append
@@ -309,7 +329,7 @@ export default function Home() {
 
     try {
       const rawFiles = files.map((f) => f.file);
-      const text = await handleDigitalizeRequest(apiUrl, rawFiles, auth.token);
+      const text = await handleDigitalizeRequest(apiUrl, rawFiles, auth.token, selectedPromptId);
       setDigitalizedText(text);
       setStatus('preview');
     } catch (error) {
@@ -527,11 +547,36 @@ export default function Home() {
                     </div>
                   )}
 
+                  {/* Seletor de prompt / skill */}
+                  {availablePrompts.length > 0 && (
+                    <div className={styles.field}>
+                      <label className={styles.label} htmlFor="prompt-select">
+                        Estilo de Digitalização
+                      </label>
+                      <select
+                        id="prompt-select"
+                        value={selectedPromptId}
+                        onChange={(e) => setSelectedPromptId(e.target.value)}
+                        className={styles.selectInput}
+                      >
+                        {availablePrompts.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
+                      <span className={styles.hint}>
+                        {availablePrompts.find((p) => p.id === selectedPromptId)?.description}
+                      </span>
+                    </div>
+                  )}
+
                   <button
                     onClick={handleDigitalize}
                     className={`button button--primary button--lg ${styles.mainButton}`}
                     disabled={
                       files.length === 0 ||
+                      !selectedPromptId ||
                       (saveMode === 'create' && !path.trim()) ||
                       (saveMode === 'append' && !selectedFile)
                     }
