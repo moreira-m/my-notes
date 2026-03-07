@@ -179,14 +179,14 @@ app.get('/docs/files', async (req: Request, res: Response) => {
 // ============================================================
 app.post('/save', requireAuth, async (req: Request, res: Response) => {
     try {
-        const { text, path: destPath, mode = 'create' } = req.body;
+        const { text, path: destPath, mode = 'create', title } = req.body;
 
-        if (!text || !destPath) {
-            return res.status(400).json({ error: 'text and path are required' });
+        if (!text || destPath === undefined) {
+            return res.status(400).json({ error: 'text e path são obrigatórios' });
         }
 
-        // Sanitiza o caminho
-        const sanitized = destPath.replace(/\.\./g, '').replace(/^\/+/, '');
+        // Sanitiza o caminho (agora pode ser string vazia para o root)
+        const sanitized = destPath.replace(/\.\./g, '').replace(/^\/+/, '').replace(/\/+$/, '');
 
         if (isGitHubConfigured()) {
             // ---- MODO GITHUB ----
@@ -204,9 +204,21 @@ app.post('/save', requireAuth, async (req: Request, res: Response) => {
                 );
                 commitMsg = 'Texto anexado com sucesso!';
             } else {
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-                const fileName = `anotacao-${timestamp}.md`;
-                const newPath = `${sanitized}/${fileName}`;
+                let fileName: string = '';
+                if (title) {
+                    // Transforma em kebab-case
+                    const cleanTitle = title.trim().toLowerCase()
+                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove acentos
+                        .replace(/[^a-z0-9]+/g, '-');
+                    fileName = cleanTitle ? `${cleanTitle}.md` : '';
+                }
+
+                if (!fileName || fileName === '.md') {
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                    fileName = `anotacao-${timestamp}.md`;
+                }
+
+                const newPath = sanitized ? `${sanitized}/${fileName}` : fileName;
                 filePath = await ghCreateOrUpdateFile(
                     newPath,
                     text,
@@ -219,10 +231,10 @@ app.post('/save', requireAuth, async (req: Request, res: Response) => {
         }
 
         // ---- MODO LOCAL (fallback) ----
-        const fullPath = path.join(DOCS_DIR, sanitized);
+        const fullPath = sanitized ? path.join(DOCS_DIR, sanitized) : DOCS_DIR;
         const resolvedPath = path.resolve(fullPath);
 
-        if (!resolvedPath.startsWith(DOCS_DIR)) {
+        if (!resolvedPath.startsWith(path.resolve(DOCS_DIR))) {
             return res.status(400).json({ error: 'Invalid path: must be inside docs/' });
         }
 
@@ -241,8 +253,20 @@ app.post('/save', requireAuth, async (req: Request, res: Response) => {
             console.log(`[LOCAL] Texto anexado em: ${resolvedPath}`);
         } else {
             await fs.mkdir(resolvedPath, { recursive: true });
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            const fileName = `anotacao-${timestamp}.md`;
+
+            let fileName: string = '';
+            if (title) {
+                const cleanTitle = title.trim().toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-');
+                fileName = cleanTitle ? `${cleanTitle}.md` : '';
+            }
+
+            if (!fileName || fileName === '.md') {
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                fileName = `anotacao-${timestamp}.md`;
+            }
+
             const fullFilePath = path.join(resolvedPath, fileName);
             await fs.writeFile(fullFilePath, text, 'utf-8');
             filePath = path.relative(DOCS_DIR, fullFilePath);

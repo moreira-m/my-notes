@@ -15,7 +15,7 @@ export interface Prompt {
 export const prompts: Prompt[] = [
     {
         id: 'transcrever',
-        name: '📝 Transcrever Fielmente',
+        name: 'Transcrever Fielmente',
         description: 'Transcreve o conteúdo da imagem como documentação, corrigindo apenas erros ortográficos.',
         prompt: `
 Você é um organizador de documentações técnicas focado no princípio KISS (Keep It Simple, Stupid).
@@ -32,7 +32,7 @@ Regras de Transformação:
     },
     {
         id: 'expandir',
-        name: '📖 Expandir Conteúdo',
+        name: 'Expandir Conteúdo',
         description: 'Expande notas curtas com mais contexto para facilitar a leitura.',
         prompt: `
 Você é um organizador de documentações técnicas focado em tornar notas curtas em conteúdo completo e didático.

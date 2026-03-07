@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
@@ -48,14 +48,14 @@ async function handleDigitalizeRequest(apiUrl, files, token, promptId) {
   return results.join('\n\n---\n\n');
 }
 
-async function handleSaveRequest(apiUrl, text, destinationPath, mode = 'create', token) {
+async function handleSaveRequest(apiUrl, text, destinationPath, mode = 'create', token, title) {
   const response = await fetch(`${apiUrl}/save`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ text, path: destinationPath, mode }),
+    body: JSON.stringify({ text, path: destinationPath, mode, title }),
   });
   if (!response.ok) {
     const error = await response.json();
@@ -122,7 +122,7 @@ function LoginForm({ apiUrl, onLogin }) {
   return (
     <div className={styles.card}>
       <div className={styles.loginHeader}>
-        <h2 className={styles.loginTitle}>🔐 Login</h2>
+        <h2 className={styles.loginTitle}>Login</h2>
         <p className={styles.loginSubtitle}>
           Faça login para acessar a digitalização de cadernos.
         </p>
@@ -130,14 +130,14 @@ function LoginForm({ apiUrl, onLogin }) {
 
       {error && (
         <div className={`${styles.feedback} ${styles.error}`}>
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="login-user">
-            👤 Usuário
+            Usuário
           </label>
           <input
             id="login-user"
@@ -153,7 +153,7 @@ function LoginForm({ apiUrl, onLogin }) {
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="login-pass">
-            🔑 Senha
+            Senha
           </label>
           <input
             id="login-pass"
@@ -172,7 +172,7 @@ function LoginForm({ apiUrl, onLogin }) {
           className={`button button--primary button--lg ${styles.mainButton}`}
           disabled={loading || !username.trim() || !password.trim()}
         >
-          {loading ? '⏳ Entrando...' : '🚀 Entrar'}
+          {loading ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
     </div>
@@ -192,7 +192,6 @@ export default function Home() {
 
   // Digitization state
   const [files, setFiles] = useState([]);
-  const [path, setPath] = useState('');
   const [status, setStatus] = useState('idle');
   const [digitalizedText, setDigitalizedText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -203,6 +202,11 @@ export default function Home() {
   const [saveMode, setSaveMode] = useState('create');
   const [existingFiles, setExistingFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
+
+  // Destination fields para modo create
+  const [selectedFolder, setSelectedFolder] = useState('');
+  const [newFolderName, setNewFolderName] = useState('');
+  const [title, setTitle] = useState('');
 
   // Prompts / Skills
   const [availablePrompts, setAvailablePrompts] = useState([]);
@@ -223,22 +227,45 @@ export default function Home() {
         if (list.length > 0) setSelectedPromptId(list[0].id);
       })
       .catch((err) => console.error('Erro ao carregar prompts:', err));
-  }, []);
+  }, [apiUrl]);
 
-  // Carrega lista de arquivos existentes ao trocar para modo append
+  // Carrega lista de arquivos existentes quando logado
   useEffect(() => {
-    if (saveMode === 'append') {
+    if (auth) {
       fetchExistingFiles(apiUrl)
-        .then((files) => {
-          setExistingFiles(files);
-          if (files.length > 0 && !selectedFile) setSelectedFile(files[0]);
+        .then((fetchedFiles) => {
+          setExistingFiles(fetchedFiles);
+          if (fetchedFiles.length > 0 && !selectedFile) setSelectedFile(fetchedFiles[0]);
         })
         .catch((err) => {
           console.error(err);
           setFeedback({ type: 'error', message: 'Erro ao carregar arquivos existentes.' });
         });
     }
-  }, [saveMode]);
+  }, [auth, apiUrl]); // Removido dependencia em saveMode
+
+  const existingFolders = useMemo(() => {
+    const folders = new Set();
+    existingFiles.forEach(file => {
+      const parts = file.split('/');
+      parts.pop(); // remove file name
+      if (parts.length > 0) {
+        folders.add(parts.join('/'));
+      } else {
+        folders.add('/'); // Root
+      }
+    });
+    return Array.from(folders).sort();
+  }, [existingFiles]);
+
+  // Seta um valor inicial para pasta selecionada quando as pastas carregam
+  useEffect(() => {
+    if (existingFolders.length > 0 && !selectedFolder) {
+      setSelectedFolder(existingFolders[0]);
+    } else if (existingFolders.length === 0 && !selectedFolder) {
+      setSelectedFolder('new_folder');
+    }
+  }, [existingFolders, selectedFolder]);
 
   // --- AUTH HANDLERS ---
 
@@ -310,13 +337,15 @@ export default function Home() {
 
   // --- ACTION HANDLERS ---
 
+  const destFolder = selectedFolder === 'new_folder' ? newFolderName.trim() : (selectedFolder === '/' ? '' : selectedFolder);
+
   async function handleDigitalize() {
     if (files.length === 0) {
       setFeedback({ type: 'error', message: 'Selecione pelo menos uma imagem.' });
       return;
     }
-    if (saveMode === 'create' && !path.trim()) {
-      setFeedback({ type: 'error', message: 'Informe o caminho de destino.' });
+    if (saveMode === 'create' && selectedFolder === 'new_folder' && !newFolderName.trim()) {
+      setFeedback({ type: 'error', message: 'Informe o nome da nova pasta.' });
       return;
     }
     if (saveMode === 'append' && !selectedFile) {
@@ -350,14 +379,18 @@ export default function Home() {
     setFeedback(null);
 
     try {
-      const destPath = saveMode === 'append' ? selectedFile : path.trim();
-      const result = await handleSaveRequest(apiUrl, digitalizedText, destPath, saveMode, auth.token);
+      const destPath = saveMode === 'append' ? selectedFile : destFolder;
+      const result = await handleSaveRequest(apiUrl, digitalizedText, destPath, saveMode, auth.token, title);
 
       const msg = saveMode === 'append'
         ? `Texto anexado em docs/${result.filePath}!`
         : `Texto salvo em docs/${result.filePath}!`;
 
       setFeedback({ type: 'success', message: msg });
+
+      // Atualizar lista de arquivos
+      fetchExistingFiles(apiUrl).then(setExistingFiles).catch(console.error);
+
       resetState();
     } catch (error) {
       console.error('Erro ao salvar:', error);
@@ -383,7 +416,7 @@ export default function Home() {
   function resetState() {
     files.forEach((f) => URL.revokeObjectURL(f.preview));
     setFiles([]);
-    setPath('');
+    setTitle('');
     setStatus('idle');
     setDigitalizedText('');
     setIsEditing(false);
@@ -391,7 +424,20 @@ export default function Home() {
   }
 
   // Caminho de destino exibido na prévia
-  const displayPath = saveMode === 'append' ? selectedFile : path;
+  let displayPath = '';
+  if (saveMode === 'append') {
+    displayPath = selectedFile;
+  } else {
+    displayPath = destFolder ? `${destFolder}/` : '';
+    if (title) {
+      const cleanTitle = title.trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-');
+      displayPath += cleanTitle ? `${cleanTitle}.md` : 'anotacao.md';
+    } else {
+      displayPath += 'anotacao-[data-atual].md';
+    }
+  }
 
   // --- RENDER ---
 
@@ -403,7 +449,7 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.header}>
-            <h1 className={styles.title}>📓 Digitalizar Caderno</h1>
+            <h1 className={styles.title}>Digitalizar Caderno</h1>
             <p className={styles.subtitle}>
               Fotografe suas anotações e transforme em documentação digital.
             </p>
@@ -413,20 +459,20 @@ export default function Home() {
           {auth && (
             <div className={styles.userBar}>
               <span className={styles.userInfo}>
-                👤 Logado como <strong>{auth.username}</strong>
+                Logado como <strong>{auth.username}</strong>
               </span>
               <button
                 onClick={handleLogout}
                 className={`button button--outline button--sm ${styles.logoutBtn}`}
               >
-                🚪 Sair
+                Sair
               </button>
             </div>
           )}
 
           {feedback && (
             <div className={`${styles.feedback} ${styles[feedback.type]}`}>
-              {feedback.type === 'success' ? '✅' : '⚠️'} {feedback.message}
+              {feedback.message}
             </div>
           )}
 
@@ -444,20 +490,20 @@ export default function Home() {
                       className={`${styles.modeBtn} ${saveMode === 'create' ? styles.modeBtnActive : ''}`}
                       onClick={() => setSaveMode('create')}
                     >
-                      📄 Nova documentação
+                      Nova documentação
                     </button>
                     <button
                       className={`${styles.modeBtn} ${saveMode === 'append' ? styles.modeBtnActive : ''}`}
                       onClick={() => setSaveMode('append')}
                     >
-                      📎 Continuar existente
+                      Continuar existente
                     </button>
                   </div>
 
                   {/* Input de arquivo */}
                   <div className={styles.field}>
                     <label className={styles.label} htmlFor="file-input">
-                      📸 Fotos das Anotações
+                      Fotos das Anotações
                     </label>
                     <input
                       id="file-input"
@@ -475,7 +521,7 @@ export default function Home() {
                   {files.length > 0 && (
                     <div className={styles.field}>
                       <label className={styles.label}>
-                        🔢 Ordem das imagens ({files.length})
+                        Ordem das imagens ({files.length})
                         <span className={styles.hint}> — arraste ou use as setas para reordenar</span>
                       </label>
                       <div className={styles.imageGrid}>
@@ -504,26 +550,63 @@ export default function Home() {
 
                   {/* Destino: caminho novo ou arquivo existente */}
                   {saveMode === 'create' ? (
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="path-input">
-                        📁 Caminho de Destino
-                      </label>
-                      <input
-                        id="path-input"
-                        type="text"
-                        value={path}
-                        onChange={(e) => setPath(e.target.value)}
-                        placeholder="Ex: Matemática/CálculoI"
-                        className={styles.textInput}
-                      />
-                      <span className={styles.hint}>
-                        Novo arquivo será criado em <code>docs/{path || '...'}/</code>
-                      </span>
-                    </div>
+                    <>
+                      <div className={styles.field}>
+                        <label className={styles.label} htmlFor="folder-select">
+                          Pasta de Destino
+                        </label>
+                        <select
+                          id="folder-select"
+                          value={selectedFolder}
+                          onChange={(e) => setSelectedFolder(e.target.value)}
+                          className={styles.selectInput}
+                        >
+                          {existingFolders.map((folder) => (
+                            <option key={folder} value={folder}>
+                              {folder === '/' ? 'Diretório Raiz (docs/)' : `docs/${folder}`}
+                            </option>
+                          ))}
+                          <option value="new_folder">Criar nova pasta...</option>
+                        </select>
+                      </div>
+
+                      {selectedFolder === 'new_folder' && (
+                        <div className={styles.field}>
+                          <label className={styles.label} htmlFor="new-folder-input">
+                            Nome da Nova Pasta
+                          </label>
+                          <input
+                            id="new-folder-input"
+                            type="text"
+                            value={newFolderName}
+                            onChange={(e) => setNewFolderName(e.target.value)}
+                            placeholder="Ex: Matematica/Calculo I"
+                            className={styles.textInput}
+                          />
+                        </div>
+                      )}
+
+                      <div className={styles.field}>
+                        <label className={styles.label} htmlFor="title-input">
+                          Título da Anotação (Opcional)
+                        </label>
+                        <input
+                          id="title-input"
+                          type="text"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="Ex: Limites e Derivadas"
+                          className={styles.textInput}
+                        />
+                        <span className={styles.hint}>
+                          Será salvo em <code>docs/{displayPath}</code>
+                        </span>
+                      </div>
+                    </>
                   ) : (
                     <div className={styles.field}>
                       <label className={styles.label} htmlFor="file-select">
-                        📎 Anexar a qual documentação?
+                        Anexar a qual documentação?
                       </label>
                       {existingFiles.length > 0 ? (
                         <>
@@ -577,11 +660,11 @@ export default function Home() {
                     disabled={
                       files.length === 0 ||
                       !selectedPromptId ||
-                      (saveMode === 'create' && !path.trim()) ||
+                      (saveMode === 'create' && selectedFolder === 'new_folder' && !newFolderName.trim()) ||
                       (saveMode === 'append' && !selectedFile)
                     }
                   >
-                    🚀 Digitalizar ({files.length} imagem{files.length !== 1 ? 'ns' : ''})
+                    Digitalizar ({files.length} {files.length === 1 ? 'imagem' : 'imagens'})
                   </button>
                 </div>
               )}
@@ -601,9 +684,9 @@ export default function Home() {
               {(status === 'preview' || status === 'saving') && (
                 <div className={styles.card}>
                   <div className={styles.previewHeader}>
-                    <h2 className={styles.previewTitle}>📄 Prévia do Texto</h2>
+                    <h2 className={styles.previewTitle}>Prévia do Texto</h2>
                     <span className={styles.previewPath}>
-                      {saveMode === 'append' ? `📎 docs/${displayPath}` : `📄 docs/${displayPath}`}
+                      docs/{displayPath}
                     </span>
                   </div>
 
@@ -627,24 +710,24 @@ export default function Home() {
                       disabled={status === 'saving'}
                     >
                       {status === 'saving'
-                        ? '⏳ Salvando...'
+                        ? 'Salvando...'
                         : saveMode === 'append'
-                          ? '📎 Anexar ao Documento'
-                          : '💾 Subir Texto Digitalizado'}
+                          ? 'Anexar ao Documento'
+                          : 'Subir Texto Digitalizado'}
                     </button>
                     <button
                       onClick={handleEdit}
                       className={`button button--secondary ${styles.actionButton}`}
                       disabled={status === 'saving'}
                     >
-                      {isEditing ? '👁️ Visualizar' : '✏️ Editar Texto'}
+                      {isEditing ? 'Visualizar' : 'Editar Texto'}
                     </button>
                     <button
                       onClick={handleDiscard}
                       className={`button button--danger ${styles.actionButton}`}
                       disabled={status === 'saving'}
                     >
-                      🗑️ Excluir
+                      Excluir
                     </button>
                   </div>
                 </div>
