@@ -112,6 +112,8 @@ app.post('/digitize', requireAuth, upload.single('image'), async (req: Request, 
             return res.status(400).json({ error: 'promptId is required' });
         }
 
+        const targetLanguage = req.body.targetLanguage as string || 'original';
+
         const selectedPrompt = getPromptById(promptId);
         if (!selectedPrompt) {
             return res.status(400).json({ error: `Prompt não encontrado: ${promptId}` });
@@ -127,8 +129,15 @@ app.post('/digitize', requireAuth, upload.single('image'), async (req: Request, 
             }
         }
 
+        let finalPrompt = selectedPrompt.prompt;
+        if (targetLanguage === 'pt') {
+            finalPrompt += '\n\nATENÇÃO: Você DEVE traduzir todo o conteúdo final extraído para o idioma Português (Portuguese), mantendo intacta toda a estrutura e fidelidade exigida pelas regras acima.';
+        } else if (targetLanguage === 'en') {
+            finalPrompt += '\n\nATENÇÃO: Você DEVE traduzir todo o conteúdo final extraído para o idioma Inglês (English), mantendo intacta toda a estrutura e fidelidade exigida pelas regras acima.';
+        }
+
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent([selectedPrompt.prompt, imagePart]);
+        const result = await model.generateContent([finalPrompt, imagePart]);
         const response = await result.response;
         const text = response.text();
 

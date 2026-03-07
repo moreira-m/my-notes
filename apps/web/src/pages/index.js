@@ -27,12 +27,15 @@ async function fetchPrompts(apiUrl) {
   return data.prompts;
 }
 
-async function handleDigitalizeRequest(apiUrl, files, token, promptId) {
+async function handleDigitalizeRequest(apiUrl, files, token, promptId, targetLanguage) {
   const results = [];
   for (const file of files) {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('promptId', promptId);
+    if (targetLanguage) {
+      formData.append('targetLanguage', targetLanguage);
+    }
     const response = await fetch(`${apiUrl}/digitize`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
@@ -208,9 +211,10 @@ export default function Home() {
   const [newFolderName, setNewFolderName] = useState('');
   const [title, setTitle] = useState('');
 
-  // Prompts / Skills
+  // Prompts / Skills / Translation
   const [availablePrompts, setAvailablePrompts] = useState([]);
   const [selectedPromptId, setSelectedPromptId] = useState('');
+  const [targetLanguage, setTargetLanguage] = useState('original');
 
   const fileInputRef = useRef(null);
   const idCounter = useRef(0);
@@ -358,7 +362,7 @@ export default function Home() {
 
     try {
       const rawFiles = files.map((f) => f.file);
-      const text = await handleDigitalizeRequest(apiUrl, rawFiles, auth.token, selectedPromptId);
+      const text = await handleDigitalizeRequest(apiUrl, rawFiles, auth.token, selectedPromptId, targetLanguage);
       setDigitalizedText(text);
       setStatus('preview');
     } catch (error) {
@@ -653,6 +657,22 @@ export default function Home() {
                       </span>
                     </div>
                   )}
+
+                  <div className={styles.field}>
+                    <label className={styles.label} htmlFor="language-select">
+                      Idioma de Destino (Opcional)
+                    </label>
+                    <select
+                      id="language-select"
+                      value={targetLanguage}
+                      onChange={(e) => setTargetLanguage(e.target.value)}
+                      className={styles.selectInput}
+                    >
+                      <option value="original">Original</option>
+                      <option value="pt">Português</option>
+                      <option value="en">Inglês</option>
+                    </select>
+                  </div>
 
                   <button
                     onClick={handleDigitalize}
