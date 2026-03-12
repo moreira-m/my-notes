@@ -1,6 +1,10 @@
-# Software Design & Quality
+# Project Concepts
 
-## Attributes (FURPS)
+---
+
+# Topic 1: Software Design & Quality
+
+### Attributes (FURPS)
 
 - This is the **blueprint phase** where **abstract requirements** are translated into a **structured model** that establishes how the system will be built and ensures its quality.
 - It involves modeling the system **before the code begins**.
@@ -12,7 +16,7 @@
 
 ---
 
-# The Design Model and Process
+# Topic 2: The Design Model and Process
 
 *   Like an architect's floor plan, start with a **high-level overview** of the system, then **iteratively zoom in** to define:
     *   Specific **interfaces**
@@ -34,31 +38,27 @@
 
 ---
 
----
-
 # Topic 3: Abstraction and Architecture
 
 *   **Abstraction** simplifies complexity by hiding the granular details of a function.
 *   **Architecture** defines the high-level structural organization and interaction of those abstracted components.
 
-## Abstraction
+### Abstraction
 
 *   **Abstraction**: Naming a sequence of instructions without showing the details.
     *   Example: The word "open" implies walking, reaching, grabbing, and turning.
 *   It exists in **user stories**, **use cases**, and **pseudocode**.
 
-## Architecture
+### Architecture
 
 *   **Architecture**: The organization of **program modules**, their **data structures**, and how they **interact**.
 
----
-
-# Agile Architecture Principles
+### Agile Architecture Principles
 
 *   In **Agile**, **architecture** must be defined **early on**.
     *   **Incremental development** of **architecture** is **rarely successful**.
 
-## Key Concept: Refactoring
+### Key Concept: Refactoring
 
 *   **Component refactoring** is **cheap**.
 *   **Architectural refactoring** is **catastrophic**.
@@ -71,18 +71,16 @@
     *   Breaking them down into **separate, independent modules**, which exemplifies **Separation of Concerns**.
     *   These modules are then **wrapped in strict boundaries**, allowing communication only through **specific interfaces**, which is the essence of **Encapsulation**.
 
-## Separation of Concerns
+### Separation of Concerns
 *   A **divide-and-conquer strategy**.
 
-## Modularity
+### Modularity
 *   The only attribute that makes software **intellectually manageable**.
 
-## Encapsulation
+### Encapsulation
 *   Protects **internal data and methods** from **outside interference**.
 
----
-
-# Modularity and Cost Considerations
+### Modularity and Cost Considerations
 
 *   As the **number of modules increases**:
     *   The **cost per individual module decreases**.
@@ -91,7 +89,7 @@
     *   **Bug propagation** is **physically limited**.
     *   This **prevents cascading system failures**.
 
-## Cost-Module Relationship
+### Cost-Module Relationship
 
 *   The relationship between **cost** and the **number of modules** typically forms a U-shaped curve.
     *   Initially, more modules lead to lower per-unit costs.
@@ -105,7 +103,7 @@
     *   Do exactly **one thing very well** (**High Cohesion**).
     *   Rely as **little as possible** on other modules to do it (**Low Coupling**).
 
-## Key Concepts
+### Key Concepts
 
 *   **Cohesion**:
     *   Refers to **functional robustness**.
@@ -113,7 +111,7 @@
 *   **Coupling**:
     *   Describes the **relative interdependence** between modules.
 
-## Golden Rule
+### Golden Rule
 
 *   **High Cohesion** (single-focused purpose) + **Low Coupling** (minimal external dependencies) = **Robust Software**.
 
@@ -132,6 +130,6 @@
 - **Simplifies the design**.
   - However, it carries the **risk of involuntary side effects**.
 
-## Preparatory Refactoring
+### Preparatory Refactoring
 
 - Sometimes, you must **restructure the code first** to **make adding a new feature easier**.
