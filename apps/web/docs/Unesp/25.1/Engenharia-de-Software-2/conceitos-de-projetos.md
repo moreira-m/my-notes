@@ -1,8 +1,13 @@
+---
+toc_min_heading_level: 2
+toc_max_heading_level: 2
+---
+
 # Project Concepts
 
 ---
 
-# Topic 1: Software Design & Quality
+## Topic 1: Software Design & Quality
 
 ### Attributes (FURPS)
 
@@ -16,7 +21,7 @@
 
 ---
 
-# Topic 2: The Design Model and Process
+## Topic 2: The Design Model and Process
 
 *   Like an architect's floor plan, start with a **high-level overview** of the system, then **iteratively zoom in** to define:
     *   Specific **interfaces**
@@ -38,7 +43,7 @@
 
 ---
 
-# Topic 3: Abstraction and Architecture
+## Topic 3: Abstraction and Architecture
 
 *   **Abstraction** simplifies complexity by hiding the granular details of a function.
 *   **Architecture** defines the high-level structural organization and interaction of those abstracted components.
@@ -65,7 +70,7 @@
 
 ---
 
-# Topic 4: Modularity, Encapsulation, and Separation of Concerns
+## Topic 4: Modularity, Encapsulation, and Separation of Concerns
 
 *   **Complex problems** are solved by:
     *   Breaking them down into **separate, independent modules**, which exemplifies **Separation of Concerns**.
@@ -97,7 +102,7 @@
 
 ---
 
-# Topic 5: Functional Independence (Cohesion vs. Coupling)
+## Topic 5: Functional Independence (Cohesion vs. Coupling)
 
 *   **High-quality modules** should:
     *   Do exactly **one thing very well** (**High Cohesion**).
@@ -117,7 +122,7 @@
 
 ---
 
-# Topic 6: Refactoring
+## Topic 6: Refactoring
 
 - A **rigorous process** of **cleaning up** and **optimizing internal code structure**.
   - This is done **without altering the system's external behavior or output**.
