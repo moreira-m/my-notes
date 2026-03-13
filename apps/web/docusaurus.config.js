@@ -32,6 +32,7 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
+          routeBasePath: '/',
         },
         // Blog desativado — o foco é documentação + digitalização
         blog: false,
@@ -62,10 +63,10 @@ const config = {
             label: 'Documentação',
           },
           {
-            to: '/',
+            to: '/digitalizar',
             label: 'Digitalizar',
             position: 'left',
-            activeBaseRegex: '^/$',
+            activeBaseRegex: '^/digitalizar',
           },
         ],
       },
@@ -77,11 +78,11 @@ const config = {
             items: [
               {
                 label: 'Documentação',
-                to: '/docs/intro',
+                to: '/',
               },
               {
                 label: 'Digitalizar',
-                to: '/',
+                to: '/digitalizar',
               },
             ],
           },
