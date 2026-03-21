@@ -16,6 +16,7 @@ const config = {
 
   customFields: {
     apiUrl: process.env.API_URL || 'http://localhost:3333',
+    accessPassword: process.env.ACCESS_PASSWORD || '1234', // '1234' é um padrão de desenvolvimento local
   },
 
   onBrokenLinks: 'throw',
