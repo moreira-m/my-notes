@@ -39,6 +39,16 @@ O objetivo principal do sistema é inserir outra forma de renda para a base da c
 4. Tendo os documentos validados pelo verificador de resultados, o crédito fica disponível na plataforma para que empresas e entidades gestoras possam acessar e solicitar a compra. O crédito fica à disposição na plataforma, sendo uma junção de muitas notas fiscais que compõem um crédito completo.
 5. Efetuada a compra, é analisado o valor pago, quantidade de notas fiscais que compõem o crédito e a pesagem de cada uma. O valor é distribuído proporcionalmente ao peso de cada nota que compõe o crédito. <mark>(*É necessário ter o rastreio da nota fiscal atrelada ao CNPJ gerador durante todo o fluxo*)</mark>
 
+## Diagramas
+
+### Diagrama de Processos
+
+![Diagrama de Processos](/img/diagrama-de-processo.png)
+
+### Diagrama de Sequencia
+
+![Diagrama de Sequencia](/img/diagrama-de-sequencia.png)
+
 
 ## Tipos de Arquiteturas
 
