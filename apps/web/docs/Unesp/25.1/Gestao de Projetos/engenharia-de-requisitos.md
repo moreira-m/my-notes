@@ -1,16 +1,16 @@
 # Modelagem de Requisitos
 
 ## 1. O que são requisitos: 
-Definem o que o sistema deve fazer e sob quais restrições ele deve operar. Divididos em duas categorias fundamentais:
+Definem o que o sistema deve fazer e sob quais restrições ele deve operar. São divididos em duas categorias fundamentais:
 * ### Requisitos funcionais: 
-  * Estão relacionados com as ações práticas do sistema, ou seja, suas funcionalidades diretas (ex.: realizar uma transferência bancária, emitir um relatório)
+  * Estão relacionados com as ações práticas do sistema, ou seja, suas funcionalidades diretas (ex.: realizar uma transferência bancária, emitir um relatório).
 * ### Requisitos não funcionais: 
-  * Estão relacionados à qualidade do serviço e definem as restrições ao funcionamento do sistema (ex.: ter disponibilidade de 99,9%, tempo de resposta máximo de 1 segundo, portabilidade e segurança)
+  * Estão relacionados à qualidade do serviço e definem as restrições ao funcionamento do sistema (ex.: ter disponibilidade de 99,9%, tempo de resposta máximo de 1 segundo, portabilidade e segurança).
 
 ## 2. A engenharia de requisitos: 
 Conjunto de atividades sistemáticas para descobrir (elicitar), analisar, especificar e manter os requisitos de software.
 * ### Elicitação: 
-  * É a fase investigativa onde interagimos com os stakeholders para entender suas necessidades. Pode ser feita por meio de entrevistas, questionários, workshops, uso de protótipos ou até mesmo etnografia (observação silenciosa do ambiente do cliente)
+  * É a fase investigativa onde interagimos com os stakeholders para entender suas necessidades. Pode ser feita por meio de entrevistas, questionários, workshops, uso de protótipos ou até mesmo etnografia (observação silenciosa do ambiente do cliente).
 * ### Validação: 
   * Após levantados, os requisitos devem ser verificados para garantir que sejam corretos, precisos (sem ambiguidade), completos, consistentes e verificáveis.
 
@@ -24,11 +24,11 @@ A forma como documentamos essas necessidades varia radicalmente dependendo da ab
 ## 4. O coração da modelagem ágil - Histórias de Usuário:
 Em projetos ágeis, utilizamos <b>User Stories</b> no lugar de longas especificações textuais. Elas são descrições simples de funcionalidades, escritas na perspectiva de quem vai usá-las.
 * ### Estrutura básica:
-  * "Como um [papel de usuário], eu quero/gostaria de [funcionalidades] para que [valor de negócio/objetivo]"
+  * "Como um [papel de usuário], eu quero/gostaria de [funcionalidades] para que [valor de negócio/objetivo]".
 * ### O princípio dos 3 C's:
-  * A história vive através do Cartão (o lembrete físico do requisito), da conversa (o diálogo contínuo da equipe com o representante do cliente) e da confirmação (os testes de aceitação objetivos que atestam que a história está pronta)
+  * A história vive através do Cartão (o lembrete físico do requisito), da conversa (o diálogo contínuo da equipe com o representante do cliente) e da confirmação (os testes de aceitação objetivos que atestam que a história está pronta).
 * ### Critérios de qualidade (INVEST):
-  * Uma boa história de usuário deve ser Independente, Negociável, Valiosa, Estimável, Sucinta (pequena) e testável.
+  * Uma boa história de usuário deve ser Independente, Negociável, Valiosa, Estimável, Sucinta (pequena) e Testável.
 * ### Hierarquia: 
   * Requisitos muito grandes e complexos são chamados de Épicos. Como eles não cabem em uma única iteração, devem ser quebrados em funcionalidades e, finalmente, em histórias menores e acionáveis.
 
