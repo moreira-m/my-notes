@@ -26,6 +26,17 @@ Solução: desenvolvimento de um pool de créditos no qual as cooperativas fazem
 
 O objetivo principal do sistema é inserir outra forma de renda para a base da cadeia (cooperativas e catadores).
 
+## Objetivos de Desenvolvimento Sustentável Cumpridos
+
+Os [Objetivos de Desenvolvimento Susntentáveis (ODS)](./ods.md) da ONU sao métricas globais ideal para justificar o impacto de projetos tecnológicos voltados ao meio ambiente e a sociedade. 
+
+O projeto atende diretamente esses 3 ODS principais:
+
+<div style={{ display: 'flex', gap: '20px' }}>
+  <img src="/img/SDG-8.svg" alt="SDG 8" style={{ width: '200px' }} />
+  <img src="/img/SDG-11.svg" alt="SDG 11" style={{ width: '200px' }} />
+  <img src="/img/SDG-12.svg" alt="SDG 12" style={{ width: '200px' }} />
+</div>
 
 ## Fluxos do Sistema
 
