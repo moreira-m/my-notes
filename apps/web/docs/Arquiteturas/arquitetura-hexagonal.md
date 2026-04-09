@@ -13,3 +13,9 @@ Esse modelo se baseia nos mesmos princípios de Clean Architecture e Onion Archi
  | :--------------------- | :----------- |
  | Separation of concerns | Complexidade |
  | Testabilidade          |              |
+
+
+
+## Exemplos:
+
+[Arquitetura Hexagonal (with modular monolith)](https://gist.github.com/corlaez/32707a1c41485d056c00251206435c89)
